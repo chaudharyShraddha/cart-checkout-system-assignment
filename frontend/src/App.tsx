@@ -1,3 +1,21 @@
+/**
+ * Main App Component
+ * 
+ * E-commerce cart and checkout system application
+ * 
+ * Features:
+ * - Product browsing and cart management
+ * - Checkout with discount code support
+ * - Order confirmation
+ * - Admin dashboard for statistics
+ * 
+ * State Management:
+ * - view: Current view state (shop, checkout, confirmation, admin)
+ * - cart: Current shopping cart
+ * - order: Last completed order (for confirmation view)
+ * - loading: Loading state for initial cart creation
+ */
+
 import React, { useState, useEffect } from 'react';
 import { Cart as CartType, Order, Product } from './types';
 import { cartApi } from './services/api';
@@ -7,7 +25,10 @@ import Checkout from './components/Checkout';
 import OrderConfirmation from './components/OrderConfirmation';
 import AdminDashboard from './components/AdminDashboard';
 
-// Sample products data
+/**
+ * Sample products data
+ * In a real application, this would be fetched from an API
+ */
 const SAMPLE_PRODUCTS: Product[] = [
   {
     id: 'prod-1',
@@ -47,15 +68,27 @@ const SAMPLE_PRODUCTS: Product[] = [
   },
 ];
 
+/**
+ * View type definition
+ * Represents the different views in the application
+ */
 type View = 'shop' | 'checkout' | 'confirmation' | 'admin';
 
+/**
+ * Main App Component
+ * 
+ * @returns JSX.Element - The main application component
+ */
 function App() {
   const [view, setView] = useState<View>('shop');
   const [cart, setCart] = useState<CartType | null>(null);
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Initialize cart on mount
+  /**
+   * Initialize cart on component mount
+   * Creates a new cart when the app loads
+   */
   useEffect(() => {
     const initializeCart = async () => {
       try {
@@ -71,6 +104,10 @@ function App() {
     initializeCart();
   }, []);
 
+  /**
+   * Handle cart update after item operations (add/remove)
+   * Fetches the latest cart state from the backend
+   */
   const handleCartUpdate = async () => {
     if (!cart) return;
     try {
@@ -81,12 +118,22 @@ function App() {
     }
   };
 
+  /**
+   * Handle successful checkout
+   * Updates the order state and switches to confirmation view
+   * 
+   * @param orderData - The completed order data
+   */
   const handleCheckoutSuccess = (orderData: Order) => {
     setOrder(orderData);
     setView('confirmation');
     setCart(null); // Clear cart after successful checkout
   };
 
+  /**
+   * Handle continue shopping after order confirmation
+   * Creates a new cart and returns to the shop view
+   */
   const handleContinueShopping = async () => {
     try {
       setLoading(true);

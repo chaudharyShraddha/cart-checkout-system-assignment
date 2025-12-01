@@ -1,3 +1,19 @@
+/**
+ * OrderConfirmation Component
+ * 
+ * Displays order confirmation details after successful checkout
+ * 
+ * Features:
+ * - Order number and ID
+ * - Order items and quantities
+ * - Subtotal, discount (if applied), and total
+ * - Special message for nth orders (every 3rd order)
+ * - Continue shopping button
+ * 
+ * @param order - The completed order object
+ * @param onContinueShopping - Callback to return to shop and create new cart
+ */
+
 import React from 'react';
 import { Order } from '../types';
 import { formatCurrencyWithCommas } from '../utils/currency';

@@ -1,3 +1,18 @@
+/**
+ * ProductList Component
+ * 
+ * Displays a grid of products with add to cart functionality
+ * 
+ * Features:
+ * - Product cards with image placeholder, name, description, and price
+ * - Add to cart button with loading state
+ * - Error handling for failed add operations
+ * 
+ * @param products - Array of products to display
+ * @param cartId - Current cart ID
+ * @param onCartUpdate - Callback to refresh cart after adding item
+ */
+
 import React, { useState } from 'react';
 import { Product } from '../types';
 import { cartApi } from '../services/api';
@@ -12,7 +27,12 @@ interface ProductListProps {
 const ProductList: React.FC<ProductListProps> = ({ products, cartId, onCartUpdate }) => {
   const [addingProductId, setAddingProductId] = useState<string | null>(null);
 
-  // Add product to cart with loading state
+  /**
+   * Add product to cart
+   * Shows loading state while adding and handles errors
+   * 
+   * @param product - The product to add to cart
+   */
   const handleAddToCart = async (product: Product) => {
     setAddingProductId(product.id);
     try {

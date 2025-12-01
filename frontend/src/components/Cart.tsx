@@ -1,3 +1,19 @@
+/**
+ * Cart Component
+ * 
+ * Displays the shopping cart with items and total
+ * 
+ * Features:
+ * - Display cart items with quantity and price
+ * - Remove items from cart
+ * - Show cart total
+ * - Checkout button (if cart has items)
+ * 
+ * @param cart - The cart object containing items and total
+ * @param onCartUpdate - Callback function to refresh cart after changes
+ * @param onCheckout - Optional callback function to navigate to checkout
+ */
+
 import React from 'react';
 import { Cart as CartType, CartItem } from '../types';
 import { cartApi } from '../services/api';
@@ -10,7 +26,11 @@ interface CartProps {
 }
 
 const Cart: React.FC<CartProps> = ({ cart, onCartUpdate, onCheckout }) => {
-  // Remove item from cart with confirmation
+  /**
+   * Remove item from cart with user confirmation
+   * 
+   * @param itemId - The ID of the item to remove
+   */
   const handleRemoveItem = async (itemId: string) => {
     if (!window.confirm('Are you sure you want to remove this item from cart?')) {
       return;

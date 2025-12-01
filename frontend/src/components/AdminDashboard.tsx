@@ -1,3 +1,21 @@
+/**
+ * AdminDashboard Component
+ * 
+ * Admin interface for viewing store statistics and managing discount codes
+ * 
+ * Features:
+ * - Display store statistics (orders, items, revenue, discounts)
+ * - Generate discount codes for nth orders (multiples of 3)
+ * - View all discount codes with their status
+ * 
+ * Statistics displayed:
+ * - Total orders
+ * - Items purchased count
+ * - Total revenue (before discounts)
+ * - Total discount amount given
+ * - List of all discount codes
+ */
+
 import React, { useState, useEffect } from 'react';
 import { StoreStats } from '../types';
 import { adminApi } from '../services/api';
@@ -11,6 +29,9 @@ const AdminDashboard: React.FC = () => {
   const [generating, setGenerating] = useState(false);
   const [generateMessage, setGenerateMessage] = useState<string | null>(null);
 
+  /**
+   * Fetch store statistics from the backend
+   */
   const fetchStats = async () => {
     setLoading(true);
     setError(null);
@@ -28,6 +49,12 @@ const AdminDashboard: React.FC = () => {
     fetchStats();
   }, []);
 
+  /**
+   * Handle discount code generation
+   * Only works for order numbers that are multiples of 3
+   * 
+   * @returns void
+   */
   const handleGenerateDiscount = async () => {
     const orderNum = parseInt(orderNumber);
     if (!orderNum || orderNum <= 0) {

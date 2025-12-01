@@ -1,3 +1,19 @@
+/**
+ * Checkout Component
+ * 
+ * Handles the checkout process including:
+ * - Displaying order items
+ * - Discount code validation and application
+ * - Order processing
+ * 
+ * Note: If no discount code is provided, the backend automatically applies
+ * the most recent unused discount code (if available).
+ * 
+ * @param cart - The cart to checkout
+ * @param onCheckoutSuccess - Callback when checkout succeeds
+ * @param onCancel - Callback to cancel checkout and return to shop
+ */
+
 import React, { useState } from 'react';
 import { Cart, Order } from '../types';
 import { checkoutApi, discountApi } from '../services/api';
@@ -19,6 +35,10 @@ const Checkout: React.FC<CheckoutProps> = ({ cart, onCheckoutSuccess, onCancel }
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  /**
+   * Validate discount code before applying
+   * Checks if the code is valid and available for use
+   */
   const handleValidateDiscount = async () => {
     if (!discountCode.trim()) {
       setDiscountValidation({ valid: false, message: 'Please enter a discount code' });
@@ -37,6 +57,11 @@ const Checkout: React.FC<CheckoutProps> = ({ cart, onCheckoutSuccess, onCancel }
     }
   };
 
+  /**
+   * Process checkout
+   * Creates an order from the cart and applies discount if provided
+   * Backend automatically applies most recent unused discount code if no code is manually provided
+   */
   const handleCheckout = async () => {
     if (cart.items.length === 0) {
       setError('Cart is empty. Cannot checkout.');
@@ -60,7 +85,10 @@ const Checkout: React.FC<CheckoutProps> = ({ cart, onCheckoutSuccess, onCancel }
     }
   };
 
-  // Calculate discount amount (10% of subtotal if valid code)
+  /**
+   * Calculate discount amount based on validation
+   * 10% of subtotal if a valid discount code is provided
+   */
   const discountAmount = discountValidation?.valid && discountValidation.discountPercent
     ? (cart.total * discountValidation.discountPercent) / 100
     : 0;
