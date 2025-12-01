@@ -38,13 +38,13 @@ export class AdminController {
             code: 'DISCOUNT-1234',
             discountPercent: 10,
             isUsed: true,
-            orderNumber: 5,
+            orderNumber: 3,
             createdAt: '2024-01-01T00:00:00.000Z',
             usedAt: '2024-01-01T01:00:00.000Z'
           }
         ],
         totalDiscountAmount: 99.99,
-        totalOrders: 5
+        totalOrders: 3
       }
     }
   })
@@ -63,7 +63,7 @@ export class AdminController {
   @Post('discount/generate')
   @ApiOperation({ 
     summary: 'Manually generate discount code',
-    description: 'Generates a discount code for a specific order number. Only works if the order number is a multiple of 5 (nth order).'
+    description: 'Generates a discount code for a specific order number. Only works if the order number is a multiple of 3 (nth order).'
   })
   @ApiResponse({ 
     status: 201, 
@@ -75,20 +75,20 @@ export class AdminController {
           code: 'DISCOUNT-1234',
           discountPercent: 10,
           isUsed: false,
-          orderNumber: 5,
+          orderNumber: 3,
           createdAt: '2024-01-01T00:00:00.000Z'
         },
-        message: 'Discount code generated successfully for order 5'
+        message: 'Discount code generated successfully for order 3'
       }
     }
   })
   @ApiResponse({ 
     status: 400, 
-    description: 'Invalid order number or order number is not a multiple of 5',
+    description: 'Invalid order number or order number is not a multiple of 3',
     schema: {
       example: {
         success: false,
-        message: 'Order number 3 is not a multiple of 5. Discount codes are only generated for every 5th order.'
+        message: 'Order number 2 is not a multiple of 3. Discount codes are only generated for every 3rd order.'
       }
     }
   })

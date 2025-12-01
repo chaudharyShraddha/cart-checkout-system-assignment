@@ -50,7 +50,7 @@ export class DiscountController {
   @Post('generate')
   @ApiOperation({ 
     summary: 'Generate discount code',
-    description: 'Generates a discount code for every 5th order. Returns null if order number is not a multiple of 5.'
+    description: 'Generates a discount code for every 3rd order. Returns null if order number is not a multiple of 3.'
   })
   @ApiResponse({ 
     status: 201, 

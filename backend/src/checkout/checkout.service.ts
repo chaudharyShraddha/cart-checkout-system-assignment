@@ -34,7 +34,10 @@ export class CheckoutService {
    * 
    * Steps:
    * 1. Validate cart exists and has items
-   * 2. Validate discount code if provided
+   * 2. Apply discount code:
+   *    - If discount code is manually provided, validate and use it
+   *    - If no code provided, automatically apply the most recent unused discount code (if available)
+   *    - This ensures discount codes generated on nth orders are automatically applied to the next order
    * 3. Calculate totals with discount
    * 4. Create order
    * 5. Mark discount code as used if applied
@@ -42,7 +45,7 @@ export class CheckoutService {
    * 7. Clear cart
    * 
    * @param cartId - Cart ID to checkout
-   * @param discountCode - Optional discount code to apply
+   * @param discountCode - Optional discount code to apply manually (if not provided, most recent unused code will be auto-applied)
    * @returns Created order
    */
   processCheckout(cartId: string, discountCode?: string): Order {
@@ -64,12 +67,21 @@ export class CheckoutService {
     // Calculate subtotal
     const subtotal = cart.total;
 
-    // Validate and apply discount code if provided
+    // Increment order number FIRST to determine which order this is
+    this.orderNumberCounter++;
+    const orderNumber = this.orderNumberCounter;
+
+    // Validate and apply discount code
     let discountAmount = 0;
     let appliedDiscountCode: string | undefined;
 
-    if (discountCode) {
-      const validation = this.discountService.validateCode(discountCode);
+    // Normalize discount code: trim and check if it's actually provided
+    const normalizedDiscountCode = discountCode?.trim();
+    const hasManualDiscountCode = normalizedDiscountCode && normalizedDiscountCode.length > 0;
+
+    // If discount code is manually provided, use it
+    if (hasManualDiscountCode) {
+      const validation = this.discountService.validateCode(normalizedDiscountCode);
       if (!validation.valid) {
         throw new BadRequestException(validation.message);
       }
@@ -80,18 +92,31 @@ export class CheckoutService {
         subtotal,
         discountPercent,
       );
-      appliedDiscountCode = discountCode.toUpperCase();
+      appliedDiscountCode = normalizedDiscountCode.toUpperCase();
 
       // Mark discount code as used
       this.discountService.markAsUsed(appliedDiscountCode);
+    } else {
+      // If no discount code provided, automatically apply the most recent unused code
+      // This ensures that discount codes generated on nth orders are automatically applied to the next order
+      // Example: Order 3 generates code → Order 4 automatically gets that code applied
+      const autoCode = this.discountService.getMostRecentUnusedCode();
+      if (autoCode && !autoCode.isUsed) {
+        // Calculate discount amount (10% of subtotal)
+        const discountPercent = autoCode.discountPercent || 10;
+        discountAmount = this.discountService.calculateDiscountAmount(
+          subtotal,
+          discountPercent,
+        );
+        appliedDiscountCode = autoCode.code;
+
+        // Mark discount code as used
+        this.discountService.markAsUsed(appliedDiscountCode);
+      }
     }
 
     // Calculate final total
     const total = Math.round((subtotal - discountAmount) * 100) / 100; // Round to 2 decimal places
-
-    // Increment order number
-    this.orderNumberCounter++;
-    const orderNumber = this.orderNumberCounter;
 
     // Create order
     const order: Order = {

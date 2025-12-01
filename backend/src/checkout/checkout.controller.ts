@@ -25,7 +25,7 @@ export class CheckoutController {
   @Post()
   @ApiOperation({ 
     summary: 'Process checkout',
-    description: 'Processes checkout for a cart. Validates and applies discount code if provided. Automatically generates discount code for every 5th order.'
+    description: 'Processes checkout for a cart. Validates and applies discount code if provided. Automatically generates discount code for every 3rd order.'
   })
   @ApiResponse({ 
     status: 201, 

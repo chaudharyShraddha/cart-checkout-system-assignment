@@ -72,8 +72,8 @@ export class CheckoutDto {
  */
 export class GenerateDiscountDto {
   @ApiProperty({
-    description: 'Order number to generate discount code for (must be a multiple of 5)',
-    example: 5,
+    description: 'Order number to generate discount code for (must be a multiple of 3)',
+    example: 3,
     minimum: 1,
   })
   @IsNumber()

@@ -5,9 +5,10 @@
  * Uses in-memory storage
  * 
  * Rules:
- * - Every nth order (default: 5) generates a discount code
+ * - Every nth order (default: 3) generates a discount code
  * - Discount code can only be used once
- * - Next discount code becomes available after the next nth order
+ * - Discount codes are automatically applied to the next order after generation
+ * - If a discount code is manually provided, it takes precedence over auto-application
  * - Discount is 10% on entire order
  */
 
@@ -21,7 +22,8 @@ export class DiscountService {
   private discountCodes: Map<string, DiscountCode> = new Map();
   
   // Configuration: every nth order generates a discount code
-  private readonly NTH_ORDER = 5;
+  // Every 3rd order (3, 6, 9, 12...) will generate a discount code
+  private readonly NTH_ORDER = 3;
   
   // Discount percentage (10%)
   private readonly DISCOUNT_PERCENT = 10;
@@ -189,6 +191,39 @@ export class DiscountService {
    */
   getNthOrder(): number {
     return this.NTH_ORDER;
+  }
+
+  /**
+   * Get the most recent unused discount code
+   * This is used to automatically apply discount to the next order after an nth order
+   * 
+   * When an nth order (e.g., order 3) generates a discount code, this method retrieves it
+   * so it can be automatically applied to the next order (e.g., order 4)
+   * 
+   * @returns Most recent unused discount code or null if none available
+   */
+  getMostRecentUnusedCode(): DiscountCode | null {
+    const allCodes = Array.from(this.discountCodes.values());
+    
+    if (allCodes.length === 0) {
+      return null;
+    }
+    
+    // Filter unused codes and sort by order number (highest first), then by creation date (most recent first)
+    // This ensures we get the code from the most recent nth order
+    const unusedCodes = allCodes
+      .filter((code) => !code.isUsed)
+      .sort((a, b) => {
+        // First sort by order number (descending) to get codes from most recent nth orders
+        if (b.orderNumber !== a.orderNumber) {
+          return b.orderNumber - a.orderNumber;
+        }
+        // If same order number, sort by creation date (most recent first)
+        return b.createdAt.getTime() - a.createdAt.getTime();
+      });
+    
+    // Return the most recent unused code, or null if none available
+    return unusedCodes.length > 0 ? unusedCodes[0] : null;
   }
 }
 
